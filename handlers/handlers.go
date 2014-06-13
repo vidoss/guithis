@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"appengine"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -33,6 +34,7 @@ func readJson(r *http.Request, v interface{}) bool {
 
 	return true
 }
+
 func writeJson(w http.ResponseWriter, v interface{}) {
 
 	if data, err := json.Marshal(v); err != nil {
@@ -42,4 +44,15 @@ func writeJson(w http.ResponseWriter, v interface{}) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(data)
 	}
+}
+
+/* http://stackoverflow.com/questions/19407343/how-can-i-unit-test-google-app-engine-go-http-handlers/23121756#23121756 */
+
+type ContextHandler struct {
+	Real func(appengine.Context, http.ResponseWriter, *http.Request)
+}
+
+func (f ContextHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	f.Real(c, w, r)
 }

@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
-	"github.com/vidoss/guithis/handlers"
+	h "github.com/vidoss/guithis/handlers"
 	"log"
 	"net/http"
 )
@@ -15,8 +15,9 @@ func init() {
 	r := mux.NewRouter()
 	n := negroni.Classic()
 
-	r.HandleFunc("/resource", handlers.GetAllResources).Methods("GET")
-	r.HandleFunc("/resource", handlers.CreateResource).Methods("POST")
+	r.Handle("/resource", h.ContextHandler{h.GetAllResources}).Methods("GET")
+	r.Handle("/resource/{id}", h.ContextHandler{h.GetResource}).Methods("GET")
+	r.Handle("/resource", h.ContextHandler{h.CreateResource}).Methods("POST")
 
 	n.UseHandler(r)
 
