@@ -1,51 +1,50 @@
 package handlers
 
 import (
-	"appengine"
 	"appengine/datastore"
-	"github.com/vidoss/guithis/models"
 	"github.com/gorilla/mux"
+	"github.com/vidoss/guithis/models"
 	"net/http"
 	"time"
 	//"log"
 )
 
-func GetResource(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func GetResource(c *AppContext, w http.ResponseWriter, r *http.Request) {
 
-		  vars := mux.Vars(r)
-		  id, ok := vars["id"]
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
 
-		  if !ok {
-				http.Error(w, "No ID!", http.StatusBadRequest)
-		  }
+	if !ok {
+		http.Error(w, "No ID!", http.StatusBadRequest)
+	}
 
-		  GetResourceById(c, w, r, id)
+	GetResourceById(c, w, r, id)
 }
 
-func GetResourceById(c appengine.Context, w http.ResponseWriter, r *http.Request, id string) {
+func GetResourceById(c *AppContext, w http.ResponseWriter, r *http.Request, id string) {
 
-		  key, err := datastore.DecodeKey(id)
-		  if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-		  }
+	key, err := datastore.DecodeKey(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 
-		  var resource models.Resource
+	var resource models.Resource
 
-		  if err := datastore.Get(c, key, &resource); err != nil {
-				http.Error(w, err.Error(), http.StatusNotFound)
-		  }
+	if err := datastore.Get(c.aeContext, key, &resource); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+	}
 
-		  resource.Id = id
-		  writeJson(w, resource)
+	resource.Id = id
+	c.render.JSON(w, http.StatusOK, resource)
 }
 
-func GetAllResources(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func GetAllResources(c *AppContext, w http.ResponseWriter, r *http.Request) {
 
-	var resources []models.Resource ;
+	var resources []models.Resource
 
 	q := datastore.NewQuery("Resource").Order("-Update").Limit(10)
 
-	keys, err := q.GetAll(c, &resources)
+	keys, err := q.GetAll(c.aeContext, &resources)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -55,22 +54,22 @@ func GetAllResources(c appengine.Context, w http.ResponseWriter, r *http.Request
 		resources[i].Id = keys[i].Encode()
 	}
 
-	writeJson(w, resources)
+	c.render.JSON(w, http.StatusOK, resources)
 
 }
 
-func CreateResource(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func CreateResource(c *AppContext, w http.ResponseWriter, r *http.Request) {
 
 	var resource models.Resource
 
 	if readJson(r, &resource) {
 
-		key := datastore.NewIncompleteKey(c, "Resource", nil)
+		key := datastore.NewIncompleteKey(c.aeContext, "Resource", nil)
 
 		resource.Update = time.Now()
 		resource.Create = time.Now()
 
-		key, err := datastore.Put(c, key, &resource)
+		key, err := datastore.Put(c.aeContext, key, &resource)
 		resource.Id = key.Encode()
 
 		if err != nil {
@@ -78,7 +77,6 @@ func CreateResource(c appengine.Context, w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		writeJson(w, resource)
+		c.render.JSON(w, http.StatusOK, resource)
 	}
 }
-

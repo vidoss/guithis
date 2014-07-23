@@ -1,35 +1,38 @@
 package handlers
 
 import (
-	"appengine"
 	"appengine/aetest"
 	"encoding/json"
+	"errors"
+	"github.com/unrolled/render"
 	"github.com/vidoss/guithis/models"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"errors"
 )
 
 func TestResource(t *testing.T) {
 
-	c, err := aetest.NewContext(nil)
-
+	aeContext, err := aetest.NewContext(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer aeContext.Close()
 
-	defer c.Close()
+	context := &AppContext{
+		aeContext: aeContext,
+		render:    render.New(render.Options{}),
+	}
 
-	if key, err := testCreateResource(c, t); err == nil {
-		testGetResource(c, t, key)
-		testGetAllResources(c, t)
+	if key, err := testCreateResource(context, t); err == nil {
+		testGetResource(context, t, key)
+		testGetAllResources(context, t, key)
 	}
 }
 
-func testCreateResource(c appengine.Context, t *testing.T) (key string, err error) {
+func testCreateResource(c *AppContext, t *testing.T) (key string, err error) {
 
 	data := `{"name":"Customer","description":"Customer Description"}`
 
@@ -39,8 +42,8 @@ func testCreateResource(c appengine.Context, t *testing.T) (key string, err erro
 	CreateResource(c, w, r)
 
 	if w.Code != http.StatusOK {
-		t.Errorf("POST /resource Failed, Expected 200, Got %v",w.Code)
-		return "",  errors.New("Create Failed")
+		t.Errorf("POST /resource Failed, Expected 200, Got %v", w.Code)
+		return "", errors.New("Create Failed")
 	}
 
 	var resource models.Resource
@@ -51,7 +54,7 @@ func testCreateResource(c appengine.Context, t *testing.T) (key string, err erro
 	return resource.Id, nil
 }
 
-func testGetResource(c appengine.Context, t *testing.T, k string) {
+func testGetResource(c *AppContext, t *testing.T, k string) {
 
 	r, _ := http.NewRequest("POST", "/resource/"+k, nil)
 	w := httptest.NewRecorder()
@@ -67,9 +70,13 @@ func testGetResource(c appengine.Context, t *testing.T, k string) {
 	if err := readResponse(w, &resource); err != nil {
 		t.Error(err)
 	}
+
+	if resource.Id != k {
+		t.Errorf("Resource Id does not match: Expected %v, Got %v\n", k, resource.Id)
+	}
 }
 
-func testGetAllResources(c appengine.Context, t *testing.T) {
+func testGetAllResources(c *AppContext, t *testing.T, k string) {
 
 	r, _ := http.NewRequest("GET", "/resource", nil)
 	w := httptest.NewRecorder()
@@ -80,19 +87,23 @@ func testGetAllResources(c appengine.Context, t *testing.T) {
 		t.Error("GET /resource Failed, status not ok...")
 	}
 
-	var resourcesArr []models.Resource;
-	if err := readResponse(w, &resourcesArr); err != nil {
+	var resArr []models.Resource
+	if err := readResponse(w, &resArr); err != nil {
 		t.Error(err)
 	}
 
-	if len(resourcesArr) == 0 {
+	if len(resArr) != 1 {
 		t.Error("Resource not created...")
 		return
 	}
-	if resourcesArr[0].Name != "Customer" {
-		t.Error("Not the created resource...")
+
+	if resArr[0].Name != "Customer" {
+		t.Errorf("Expected: Customer, Got %v\n", resArr[0].Name)
 	}
 
+	if resArr[0].Id != k {
+		t.Errorf("Expected: %v, Got %v\n", resArr[0].Id)
+	}
 }
 
 func readResponse(w *httptest.ResponseRecorder, v interface{}) error {
