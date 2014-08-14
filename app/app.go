@@ -4,33 +4,40 @@ import (
 	"appengine"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
+	"github.com/unrolled/render"
+	"github.com/vidoss/guithis/context"
 	h "github.com/vidoss/guithis/handlers"
+	"github.com/vidoss/guithis/views"
 	"log"
 	"net/http"
 )
 
 type appHandler struct {
-	c  *h.AppContext
-	fn func(*h.AppContext, http.ResponseWriter, *http.Request)
+	c  *context.AppContext
+	fn func(*context.AppContext, http.ResponseWriter, *http.Request)
 }
 
 func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	ah.c.SetAppEngineContext(appengine.NewContext(r))
+	ah.c.GaeContext = appengine.NewContext(r)
 
-	log.Println("%v", ah.c)
 	ah.fn(ah.c, w, r)
 }
 
 func init() {
 
 	// Init context
-	context := h.NewAppContext()
+	context := context.NewAppContext(render.Options{
+		Directory: "../templates",
+		Layout:    "layout",
+	})
 
 	log.Println("Setting up handlers...")
 
 	r := mux.NewRouter()
 	n := negroni.Classic()
+
+	r.Handle("/", appHandler{context, views.HomeHandler}).Methods("GET")
 
 	r.Handle("/resource", appHandler{context, h.GetAllResources}).Methods("GET")
 	r.Handle("/resource/{id}", appHandler{context, h.GetResource}).Methods("GET")

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/unrolled/render"
+	"github.com/vidoss/guithis/context"
 	"github.com/vidoss/guithis/models"
 	"io/ioutil"
 	"net/http"
@@ -21,9 +22,9 @@ func TestResource(t *testing.T) {
 	}
 	defer aeContext.Close()
 
-	context := &AppContext{
-		aeContext: aeContext,
-		render:    render.New(render.Options{}),
+	context := &context.AppContext{
+		GaeContext: aeContext,
+		Render:     render.New(render.Options{}),
 	}
 
 	if key, err := testCreateResource(context, t); err == nil {
@@ -32,7 +33,7 @@ func TestResource(t *testing.T) {
 	}
 }
 
-func testCreateResource(c *AppContext, t *testing.T) (key string, err error) {
+func testCreateResource(c *context.AppContext, t *testing.T) (key string, err error) {
 
 	data := `{"name":"Customer","description":"Customer Description"}`
 
@@ -54,7 +55,7 @@ func testCreateResource(c *AppContext, t *testing.T) (key string, err error) {
 	return resource.Id, nil
 }
 
-func testGetResource(c *AppContext, t *testing.T, k string) {
+func testGetResource(c *context.AppContext, t *testing.T, k string) {
 
 	r, _ := http.NewRequest("POST", "/resource/"+k, nil)
 	w := httptest.NewRecorder()
@@ -76,7 +77,7 @@ func testGetResource(c *AppContext, t *testing.T, k string) {
 	}
 }
 
-func testGetAllResources(c *AppContext, t *testing.T, k string) {
+func testGetAllResources(c *context.AppContext, t *testing.T, k string) {
 
 	r, _ := http.NewRequest("GET", "/resource", nil)
 	w := httptest.NewRecorder()
