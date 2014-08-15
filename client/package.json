@@ -1,7 +1,7 @@
 {
-  "name": "InstaGUI",
+  "name": "GUIthis",
   "version": "0.0.0",
-  "description": "Create Instance GUI for your rest endpoints",
+  "description": "Create instant GUI for your rest endpoints",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,5 +14,11 @@
     "jquery": "^2.1.1",
     "nanobar": "^0.2.1",
     "underscore": "^1.6.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.7",
+    "gulp-browserify": "^0.5.0",
+    "gulp-dust": "^1.0.0",
+    "gulp-rename": "^1.2.0"
   }
 }
