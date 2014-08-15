@@ -7,7 +7,7 @@ var _ = require('underscore'),
 
 var UrlBarView = _.extend( {}, DustRenderMixins, {
 
-	dust_template: "UrlBarTmpl",
+	dust_template: "UrlBarTmpl.dust",
 
 	events: {
 		"submit [data-dom-ref~=url-form]"  : "onUrlSubmit",

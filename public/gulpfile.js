@@ -9,19 +9,14 @@ gulp.task('dust', function() {
 			.pipe(gulp.dest('js/tmpl'));
 });
 
-var bfy_options = {
-	insertGlobals : true,
-	debug : !gulp.env.production
-};
-
 gulp.task('browserify', function() {
 	return gulp.src('js/main.js')
-			.pipe(browserify(bfy_options))
+			.pipe(browserify())
 			.pipe(rename('main.min.js'))
 			.pipe(gulp.dest('js'));
 });
 
 gulp.task('watch', function() {
 	gulp.watch('templates/*.dust', ['dust']);
-	gulp.watch('js/main.js', ['browserify']);
+	gulp.watch('js/*.js', ['browserify']);
 });

@@ -7,7 +7,7 @@ var _ = require('underscore'),
 
 var MainPageView = _.extend( {}, DustRenderMixins, {
 
-	dust_template: 'MainPageTmpl',
+	dust_template: 'MainPageTmpl.dust',
 
 	postRender: function(html) {
 		
