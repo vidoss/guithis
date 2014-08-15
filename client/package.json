@@ -1,0 +1,18 @@
+{
+  "name": "InstaGUI",
+  "version": "0.0.0",
+  "description": "Create Instance GUI for your rest endpoints",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "backbone": "^1.1.2",
+    "dust": "^0.3.0",
+    "jquery": "^2.1.1",
+    "nanobar": "^0.2.1",
+    "underscore": "^1.6.0"
+  }
+}

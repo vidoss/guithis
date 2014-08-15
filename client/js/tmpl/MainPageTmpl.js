@@ -1,0 +1,1 @@
+(function(){dust.register("MainPageTmpl",body_0);function body_0(chk,ctx){return chk.write("<div data-dom-ref=\"url-bar\" class=\"navbar-wrapper\"></div>");}return body_0;})();

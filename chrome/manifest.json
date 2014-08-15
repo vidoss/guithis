@@ -1,0 +1,16 @@
+{
+  "name": "Insta GUI",
+  "description": "Create instant GUI for RESTful end points",
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "icons": {
+    "16": "img/icon_16.png",
+    "128": "img/icon_128.png"
+  },
+  "app": {
+    "launch": {
+      "local_path": "app/main.html"      
+    }
+  },
+  "permissions":["cookies", "storage", "http://*/*", "https://*/*"]
+}
