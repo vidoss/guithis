@@ -9,7 +9,7 @@
   },
   "app": {
     "launch": {
-      "local_path": "app/main.html"      
+      "web_url": "http://localhost:8080/"      
     }
   },
   "permissions":["cookies", "storage", "http://*/*", "https://*/*"]

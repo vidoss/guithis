@@ -18,5 +18,5 @@ gulp.task('browserify', function() {
 
 gulp.task('watch', function() {
 	gulp.watch('templates/*.dust', ['dust']);
-	gulp.watch('js/*.js', ['browserify']);
+	gulp.watch('js/**/*.js', ['browserify']);
 });
