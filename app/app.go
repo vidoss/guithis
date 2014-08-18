@@ -35,7 +35,7 @@ func init() {
 	log.Println("Setting up handlers...")
 
 	r := mux.NewRouter()
-	n := negroni.New(negroni.NewRecovery(), negroni.NewLogger(), negroni.NewStatic(http.Dir("../public")))
+	n := negroni.Classic()
 
 	r.Handle("/", appHandler{context, views.HomeHandler}).Methods("GET")
 
